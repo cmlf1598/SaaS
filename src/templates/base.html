@@ -6,8 +6,10 @@
 </head>
 <body>
     {% include 'nav/navbar.html' %}
-    {% block content %}
-    {% endblock content %}
+    <div class="pt-20"></div>
+        {% block content %}
+        {% endblock content %}
+    </div>
     {% include 'base/js.html' %}
 </body>
 </html>
