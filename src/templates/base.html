@@ -6,6 +6,7 @@
 </head>
 <body>
     {% include 'nav/navbar.html' %}
+    {% include 'base/messages.html' with messages=messages %}
     <div class="pt-20"></div>
         {% block content %}
         {% endblock content %}

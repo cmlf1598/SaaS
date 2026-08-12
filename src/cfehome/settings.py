@@ -80,9 +80,12 @@ INSTALLED_APPS = [
     "commando",
     "visits", 
     #third party apps
+    "allauth_ui",
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
+    "widget_tweaks",
+    "slippers",
 ]
 
 # After including allauth, this was need to display the allauth links
@@ -106,7 +109,7 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [BASE_DIR / "templates"],  #templates folder path added here
-        'APP_DIRS': True,
+        'APP_DIRS':True,
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
@@ -164,6 +167,11 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 # Django Allauth Confi
+LOGIN_REDIRECT_URL = "/" # where to go after login
+ACCOUNT_AUTHENTICATION_METHOD = "username_email" # use username or email
+ACCOUNT_EMAIL_VERIFICATION="mandatory"
+ACCOUNT_EMAIL_SUBJECT_PREFIX="[Saas]"
+ACCOUNT_EMAIL_REQUIRED=True
 
 AUTHENTICATION_BACKENDS = [
     #...
