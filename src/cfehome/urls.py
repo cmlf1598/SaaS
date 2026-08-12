@@ -21,7 +21,7 @@ from .views import home_view, about_view
 
 # where url's go 
 urlpatterns = [
-    path("", home_view), # index page -> root page 
+    path("", home_view, name='home'), # index page -> root page 
     path("login/", auth_views.login_view),
     path("register/", auth_views.register_view),
     path("about/", about_view),
