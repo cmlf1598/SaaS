@@ -1,11 +1,16 @@
 import pathlib
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
+from django.contrib.admin.views.decorators import staff_member_required
+from django.conf import settings
+
 from django.http import HttpResponse
 
 this_dir = pathlib.Path(__file__).resolve().parent # parent directory
 
 from visits.models import PageVisit
+
+LOGIN_URL = settings.LOGIN_URL
 
 def home_view(request, *args, **kwargs):
     if request.user.is_authenticated:
@@ -68,7 +73,12 @@ def pw_protected_view(request, *args, **kwargs):
         return render(request, "protected/view.html", {})
     return render(request, "protected/entry.html", {})
 
-@login_required #authentication only (logged in or not)
+#authentication only (logged in or not)
+@login_required(login_url=LOGIN_URL)
 def user_only_view(request, *args, **kwargs):
+    #print(request.user.is_staff)
     return render(request, "protected/user-only.html")
 
+@staff_member_required(login_url=LOGIN_URL)
+def staff_only_view(request, *args, **kwargs):
+    return render(request, "protected/user-only.html")
