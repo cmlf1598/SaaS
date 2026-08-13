@@ -54,7 +54,8 @@ ENV DJANGO_DEBUG=${DJANGO_DEBUG}
 # run any other commands that do not need the database
 # such as:
 RUN python manage.py vendor_pull
-RUN python manage.py collectstatic --noinput
+RUN python manage.py collectstatic --noinput --ignore=input.css
+#ignore=input.css was added to fix a deployment issue
 #whitenoise -> s3
 
 # set the Django default project name
