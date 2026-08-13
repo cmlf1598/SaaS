@@ -78,6 +78,7 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     #my-apps
     "commando",
+    "profiles",
     "visits", 
     #third party apps
     "allauth_ui",
