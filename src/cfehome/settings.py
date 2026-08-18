@@ -78,6 +78,7 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     #my-apps
     "commando",
+    "customers",
     "profiles",
     "subscriptions",
     "visits", 
