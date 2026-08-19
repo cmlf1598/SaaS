@@ -1,3 +1,4 @@
+import helpers.billing
 from django.db import models
 from django.contrib.auth.models import Group, Permission
 from django.db.models.signals import post_save
@@ -17,6 +18,12 @@ SUBSCRIPTION_PERMISSIONS = [
 
 # Create your models here.
 class Subscription(models.Model):
+    """
+    Subscription Plan = Stripe Product
+    """
+
+
+
     name = models.CharField(max_length=120)
     active = models.BooleanField(default=True) # when syncing 
     groups = models.ManyToManyField(Group) #one-to-one
@@ -25,6 +32,7 @@ class Subscription(models.Model):
                       "codename__in": [x[0] for x in SUBSCRIPTION_PERMISSIONS]
                       }
     ) # show only a few choices
+    stripe_id = models.CharField(max_length=120, null=True, blank=True)
 
     def __str__(self):
         return f"{self.name}" # to show the actual name in the admin menu
@@ -32,6 +40,18 @@ class Subscription(models.Model):
 
     class Meta:
         permissions = SUBSCRIPTION_PERMISSIONS
+
+    def save(self, *args, **kwargs):      
+        if not self.stripe_id:
+            stripe_id = helpers.billing.create_product(
+                    name=self.name, 
+                    metadata={
+                        "subscription_plan_id": self.id
+                    }, 
+                    raw=False
+            )
+        self.stripe_id = stripe_id
+        super().save(*args, **kwargs)
 
 
 class UserSubscription(models.Model):
