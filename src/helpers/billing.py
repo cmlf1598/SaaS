@@ -13,10 +13,12 @@ client = StripeClient(STRIPE_SECRET_KEY)
 def create_customer(
         name="", 
         email="",
+        metadata={},
         raw=False):
     response = client.v1.customers.create({
         "name": name,
         "email": email,
+        "metadata": metadata,
     })
     if raw:
         return response
