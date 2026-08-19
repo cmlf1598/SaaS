@@ -34,11 +34,18 @@ class Subscription(models.Model):
     ) # show only a few choices
     stripe_id = models.CharField(max_length=120, null=True, blank=True)
 
+    order = models.IntegerField(default=-1, help_text='Ordering on Django pricing page')
+    featured = models.BooleanField(default=True, help_text='Featured on Django pricing page')
+    updated = models.DateTimeField(auto_now=True)
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+
     def __str__(self):
         return f"{self.name}" # to show the actual name in the admin menu
 
 
     class Meta:
+        ordering = ['order', 'featured', '-updated']
         permissions = SUBSCRIPTION_PERMISSIONS
 
     def save(self, *args, **kwargs):      
@@ -50,9 +57,8 @@ class Subscription(models.Model):
                     }, 
                     raw=False
             )
-        self.stripe_id = stripe_id
+            self.stripe_id = stripe_id
         super().save(*args, **kwargs)
-
 
 # Create your models here.
 class SubscriptionPrice(models.Model):
@@ -61,7 +67,7 @@ class SubscriptionPrice(models.Model):
     """
     class IntervalChoices(models.TextChoices):
         MONTHLY = "month", "Monthly"
-        YEARLY = "monthly", "Yearly"
+        YEARLY = "year", "Yearly"
 
     subscription = models.ForeignKey(Subscription, on_delete=models.SET_NULL, 
     null=True)
@@ -72,6 +78,13 @@ class SubscriptionPrice(models.Model):
                             )
 
     price = models.DecimalField(max_digits=10, decimal_places=2, default=99.99)
+    order = models.IntegerField(default=-1, help_text='Ordering on Django pricing page')
+    featured = models.BooleanField(default=True, help_text='Featured on Django pricing page')
+    updated = models.DateTimeField(auto_now=True)
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['subscription__order', 'order', 'featured', '-updated']
 
     @property
     def stripe_currency(self):
@@ -82,7 +95,7 @@ class SubscriptionPrice(models.Model):
         """
         remove decimal places 
         """
-        return self.price * 100
+        return int(self.price * 100)
 
     @property
     def product_stripe_id(self):
@@ -93,18 +106,25 @@ class SubscriptionPrice(models.Model):
     def save(self, *args, **kwargs):
         if (not self.stripe_id and 
             self.product_stripe_id is not None):
-            stripe_id = helpers.billing.create_price({
-                "currency": self.stripe_currency,
-                "unit_amount": self.stripe_price,
-                "interval": self.interval,
-                "product": self.product_stripe_id,
-                "metadata":{
-                        "subscription_plan_price_id": self.id
-                }, 
-                "raw": False,
-            })
+            stripe_id = helpers.billing.create_price(
+                currency=self.stripe_currency,
+                unit_amount=self.stripe_price,
+                interval=self.interval,
+                product=self.product_stripe_id,
+                metadata={
+                    "subscription_plan_price_id": self.id
+                },
+                raw=False,
+            )
             self.stripe_id = stripe_id
         super().save(*args, **kwargs)
+        #make sure only 1 price type is featured
+        if self.featured and self.subscription:
+            qs = SubscriptionPrice.objects.filter(
+                subscription=self.subscription,
+                interval=self.interval
+            ).exclude(id=self.id)
+            qs.update(featured=False)
 
 
 class UserSubscription(models.Model):
