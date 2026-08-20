@@ -25,6 +25,7 @@ class Subscription(models.Model):
 
 
     name = models.CharField(max_length=120)
+    subtitle = models.TextField(blank=True, null=True)
     active = models.BooleanField(default=True) # when syncing 
     groups = models.ManyToManyField(Group) #one-to-one
     permissions = models.ManyToManyField(Permission,
@@ -38,7 +39,8 @@ class Subscription(models.Model):
     featured = models.BooleanField(default=True, help_text='Featured on Django pricing page')
     updated = models.DateTimeField(auto_now=True)
     timestamp = models.DateTimeField(auto_now_add=True)
-
+    features = models.TextField(help_text="Features for pricing, separated by new line",
+                                blank=True, null=True)
 
     def __str__(self):
         return f"{self.name}" # to show the actual name in the admin menu
@@ -47,6 +49,12 @@ class Subscription(models.Model):
     class Meta:
         ordering = ['order', 'featured', '-updated']
         permissions = SUBSCRIPTION_PERMISSIONS
+
+    # features as a list
+    def get_features_as_list(self):
+        if not self.features:
+            return []
+        return [x.strip() for x in self.features.split("\n")]
 
     def save(self, *args, **kwargs):      
         if not self.stripe_id:
@@ -74,7 +82,7 @@ class SubscriptionPrice(models.Model):
     stripe_id = models.CharField(max_length=120, null=True, blank=True)
     interval = models.CharField(max_length=120, 
                                 default=IntervalChoices.MONTHLY,
-                                choices=IntervalChoices.choices
+                                choices=IntervalChoices.choices #get_<field_name>_display
                             )
 
     price = models.DecimalField(max_digits=10, decimal_places=2, default=99.99)
@@ -85,6 +93,24 @@ class SubscriptionPrice(models.Model):
 
     class Meta:
         ordering = ['subscription__order', 'order', 'featured', '-updated']
+
+    @property
+    def display_features_list(self):
+        if not self.subscription:
+            return []
+        return self.subscription.get_features_as_list()
+    
+    @property
+    def display_sub_name(self):
+        if not self.subscription:
+            return "Plan"
+        return f"{self.subscription.name} Plan"
+
+    @property
+    def display_sub_subtitle(self):
+        if not self.subscription:
+            return "Plan"
+        return self.subscription.subtitle
 
     @property
     def stripe_currency(self):
