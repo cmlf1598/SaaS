@@ -38,4 +38,20 @@ def checkout_redirect_view(request):
     return redirect(url)
 
 def checkout_finalize_view(request):
-    return
+    # it will grab the id value from the link after checkout. 
+    session_id = request.GET.get('session_id')
+    checkout_r = helpers.billing.get_checkout_session(session_id, raw=True)
+    sub_stripe_id = checkout_r.subscription
+    sub_r = helpers.billing.get_subscription(sub_stripe_id, raw=True)
+    sub_plan = sub_r.plan
+    sub_plan_price_stripe_id = sub_plan.id
+    price_qs = SubscriptionPrice.objects.filter(stripe_id=sub_plan_price_stripe_id)
+    customer_id = checkout_r.customer
+    print(price_qs)
+    #print(sub_r)
+    context = {
+        "subscription": sub_r,
+        "checkout": checkout_r,
+    }
+
+    return render(request, "checkout/success.html", context)

@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+
+<!-- block.super adds from base.html -->
+{% block head_title %}{{ page_title }} - {{ block.super}}{% endblock head_title %}
+
+
+<!-- Same block from base.html -->
+{% block content%}
+<h1>Success welcome!</h1>
+
+<div class="mb-12">
+    {{ subscription }}    
+</div>
+
+<div>
+    {{ checkout }}    
+</div>
+
+
+
+{% endblock content %}
