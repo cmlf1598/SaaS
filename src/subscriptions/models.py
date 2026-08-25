@@ -1,5 +1,6 @@
 import helpers.billing
 from django.db import models
+from django.db.models import Q
 from django.contrib.auth.models import Group, Permission
 from django.db.models.signals import post_save
 from django.conf import settings
@@ -168,6 +169,32 @@ class SubscriptionStatus(models.TextChoices):
     UNPAID = 'unpaid', 'Unpaid'
     PAUSED = 'paused', 'Paused'
 
+class UserSubscriptionQuerySet(models.QuerySet):
+    def by_active_trialing(self):
+        active_qs_lookup = (
+            Q(status = SubscriptionStatus.ACTIVE) |
+            Q(status = SubscriptionStatus.TRIALING)
+        )
+        return self.filter(active_qs_lookup)
+     
+    def by_user_ids(self, user_ids=None):
+        qs = self
+        if isinstance(user_ids, list):
+            qs = self.filter(user_id__in=user_ids)
+        elif isinstance(user_ids, int):
+            qs = self.filter(user_id__in=[user_ids])
+        elif isinstance(user_ids, str):
+            qs = self.filter(user_id__in=[user_ids])
+        return qs
+
+class UserSubscriptionManager(models.Manager):
+    def get_queryset(self):
+        return UserSubscriptionQuerySet(self.model, using=self._db)
+
+    # def by_user_ids(self, user_ids=None):
+    #     return self.get_queryset().by_user_ids(user_ids=user_ids)
+        
+
 class UserSubscription(models.Model):    
 
     # When user is delete, their subscription as well. 
@@ -193,6 +220,8 @@ class UserSubscription(models.Model):
     status = models.CharField(max_length=20, 
                               choices=SubscriptionStatus.choices,
                               null=True, blank=True)
+
+    objects = UserSubscriptionManager()
 
     def get_absolute_url(self):
         return reverse("user_subscription")
