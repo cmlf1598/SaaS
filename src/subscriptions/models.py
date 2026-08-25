@@ -160,7 +160,7 @@ class SubscriptionPrice(models.Model):
 
 class SubscriptionStatus(models.TextChoices):
     ACTIVE = 'active', 'Active'
-    TRAILING = 'trailing', 'Trailing'
+    TRIALING = 'trialing', 'Trialing'
     INCOMPLETE = 'incomplete', 'Incomplete'
     INCOMPLETE_EXPIRED = 'incomplete_expired', 'Incomplete Expired'
     PAST_DUE = 'past_due', 'Past Due'
