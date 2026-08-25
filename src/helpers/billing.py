@@ -17,10 +17,12 @@ def serialize_subscription_data(subscription_response):
     sub_item = subscription_response["items"]["data"][0]
     current_period_start = date_utils.timestamp_as_datetime(sub_item["current_period_start"])
     current_period_end = date_utils.timestamp_as_datetime(sub_item["current_period_end"])
+    cancel_at_period_end = subscription_response.cancel_at_period_end
     return {
         "current_period_start": current_period_start,
         "current_period_end": current_period_end,
         "status": status,
+        "cancel_at_period_end": cancel_at_period_end,
     }
 
 def create_customer(
@@ -105,19 +107,32 @@ def get_subscription(stripe_id, raw=True):
         return response
     return serialize_subscription_data(response)
 
-def cancel_subscription(stripe_id, reason="", feedback="other", raw=True):
-    response = client.v1.subscriptions.cancel(
-        stripe_id,
-        params={
-            "cancellation_details": {
-                "comment": reason,
-                "feedback": feedback,
+def cancel_subscription(stripe_id, reason="", feedback="other", cancel_at_period_end=False, raw=True):
+    if cancel_at_period_end:
+        response = client.v1.subscriptions.cancel(
+            stripe_id,
+            cancel_at_period_end=cancel_at_period_end,
+            params={
+                "cancellation_details": {
+                    "comment": reason,
+                    "feedback": feedback,
+                }
             }
-        }
-    )
+        )
+    else:
+        response = client.v1.subscriptions.cancel(
+            stripe_id,
+            params={
+                "cancellation_details": {
+                    "comment": reason,
+                    "feedback": feedback,
+                }
+            }
+        )
+
     if raw:
         return response
-    return response.url
+    return serialize_subscription_data(response)
 
 
 
