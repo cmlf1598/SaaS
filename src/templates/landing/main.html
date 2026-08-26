@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+
+<!-- block.super adds from base.html -->
+{% block head_title %}Build your SaaS now - {{ block.super}}{% endblock head_title %}
+
+
+<!-- Same block from base.html -->
+{% block content%}
+
+{% include 'landing/hero.html' %}
+{% include 'landing/features.html' %}
+{% include 'landing/proof.html' %}
+
+{% endblock content %}
