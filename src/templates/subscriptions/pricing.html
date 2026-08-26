@@ -16,10 +16,10 @@
           <div class="flex justify-center">
             <ul class="flex flex-wrap text-sm font-medium text-center text-body">
                 <li class="me-2">
-                    <a href="{{ mo_url }}" class="{% if active == 'month' %}inline-block px-4 py-2.5 text-white bg-blue-500 rounded-base active {% else %} inline-block px-4 py-3 rounded-base hover:text-heading hover:bg-neutral-secondary-soft{% endif %}" aria-current="page">Monthly</a>
+                    <a href="{{ mo_url }}" class="{% if active == 'month' %}inline-block px-4 py-2.5 text-white bg-blue-500 rounded-lg active {% else %} inline-block px-4 py-3 rounded-lg hover:text-heading hover:bg-neutral-secondary-soft{% endif %}" aria-current="page">Monthly</a>
                 </li>
                 <li class="me-2">
-                    <a href="{{ yr_url }}"  class="{% if active == 'year' %}inline-block px-4 py-2.5 text-white bg-blue-500 rounded-base active {% else %} inline-block px-4 py-3 rounded-base hover:text-heading hover:bg-neutral-secondary-soft{% endif %}">Yearly</a>
+                    <a href="{{ yr_url }}"  class="{% if active == 'year' %}inline-block px-4 py-2.5 text-white bg-blue-500 rounded-lg active {% else %} inline-block px-4 py-3 rounded-lg hover:text-heading hover:bg-neutral-secondary-soft{% endif %}">Yearly</a>
                 </li>
             </ul>
           </div>
