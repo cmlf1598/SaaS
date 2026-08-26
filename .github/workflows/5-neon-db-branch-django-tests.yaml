@@ -33,9 +33,7 @@ jobs:
       - name: Install Neon CLI
         run: |
           npm install -g neonctl
-      - name: Debug - list visible projects
-        run: |
-          neonctl projects list
+      
       - name: Delete previous branch
         continue-on-error: true
         run: |
@@ -59,7 +57,7 @@ jobs:
         run: |
           python -m pip install pip --upgrade
           python -m pip install -r requirements.txt
-          
+
       - name: Django Tests
         working-directory: ./src
         run: |
