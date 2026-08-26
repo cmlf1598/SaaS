@@ -33,6 +33,10 @@ jobs:
       - name: Install Neon CLI
         run: |
           npm install -g neonctl
+
+      - name: Debug - list projects in this org
+        run: |
+          neonctl projects list --org-id "${{ env.NEON_ORG_ID }}"
       
       - name: Delete previous branch
         continue-on-error: true
