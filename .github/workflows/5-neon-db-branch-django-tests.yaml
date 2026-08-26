@@ -32,6 +32,9 @@ jobs:
       - name: Install Neon CLI
         run: |
           npm install -g neonctl
+      - name: Debug - list visible projects
+        run: |
+          neonctl projects list
       - name: Delete previous branch 
         continue-on-error: true
         run: |
