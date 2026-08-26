@@ -1,4 +1,4 @@
-name: 5 - Branch Neon DB for Django Tests
+name: 6 - Scheduled production worker
 
 
 on:
